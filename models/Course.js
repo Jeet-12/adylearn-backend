@@ -32,6 +32,9 @@ const courseSchema = new mongoose.Schema({
         type: Number,
         required: [true, 'Please add a price'],
     },
+    discountPrice: {
+        type: Number,
+    },
     thumbnail: {
         type: String,
         required: [true, 'Please add a thumbnail'],
@@ -44,6 +47,19 @@ const courseSchema = new mongoose.Schema({
     category: {
         type: String,
         default: 'General'
+    },
+    level: {
+        type: String,
+        enum: ['Beginner', 'Intermediate', 'Advanced', 'Professional'],
+        default: 'Beginner'
+    },
+    duration: {
+        type: String,
+        default: '10 Hours'
+    },
+    certification: {
+        type: String,
+        default: 'Verified Certificate'
     },
     studentsEnrolled: {
         type: Number,
