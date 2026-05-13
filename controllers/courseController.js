@@ -99,6 +99,9 @@ exports.addVideo = async (req, res) => {
         const videoData = {
             title: req.body.title,
             videoUrl: `/uploads/videos/${req.file.filename}`,
+            videoUrl_144: `/uploads/videos/${req.file.filename}`, // Placeholder
+            videoUrl_360: `/uploads/videos/${req.file.filename}`, // Placeholder
+            videoUrl_1080: `/uploads/videos/${req.file.filename}`, // Placeholder
             duration: req.body.duration || '0:00',
             order: course.playlist.length
         };
