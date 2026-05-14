@@ -75,7 +75,7 @@ exports.getMe = async (req, res) => {
 const sendTokenResponse = async (user, statusCode, res) => {
     // Create token
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-        expiresIn: '30d',
+        expiresIn: process.env.JWT_EXPIRE || '30d',
     });
 
     // Update session token for single device restriction
