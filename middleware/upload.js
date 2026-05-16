@@ -1,13 +1,12 @@
 const multer = require('multer');
 const path = require('path');
-
 const fs = require('fs');
 
 // Ensure upload directories exist
 const uploadDirs = [
-    'uploads/thumbnails',
-    'uploads/videos',
-    'uploads/screenshots'
+    path.join(__dirname, '../uploads/thumbnails'),
+    path.join(__dirname, '../uploads/videos'),
+    path.join(__dirname, '../uploads/screenshots')
 ];
 
 uploadDirs.forEach(dir => {
@@ -19,13 +18,13 @@ uploadDirs.forEach(dir => {
 // Set storage engine
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        let dest = 'uploads/';
+        let dest = path.join(__dirname, '../uploads/');
         if (file.fieldname === 'thumbnail') {
-            dest += 'thumbnails/';
+            dest = path.join(dest, 'thumbnails/');
         } else if (file.fieldname === 'video') {
-            dest += 'videos/';
+            dest = path.join(dest, 'videos/');
         } else if (file.fieldname === 'screenshot') {
-            dest += 'screenshots/';
+            dest = path.join(dest, 'screenshots/');
         }
         cb(null, dest);
     },
@@ -37,7 +36,7 @@ const storage = multer.diskStorage({
 // Check file type
 function checkFileType(file, cb) {
     // Allowed extensions
-    const filetypes = /jpeg|jpg|png|gif|mp4|mov|avi/;
+    const filetypes = /jpeg|jpg|png|gif|webp|mp4|mov|avi/;
     // Check ext
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
     // Check mime
@@ -46,7 +45,7 @@ function checkFileType(file, cb) {
     if (mimetype && extname) {
         return cb(null, true);
     } else {
-        cb(new Error('Error: Images and Videos Only!'), false);
+        cb(new Error('Error: Images and Videos Only! (jpeg, jpg, png, gif, webp, mp4, mov, avi)'), false);
     }
 }
 

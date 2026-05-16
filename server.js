@@ -47,6 +47,25 @@ app.use((req, res) => {
     });
 });
 
+// Global Error Handler
+app.use((err, req, res, next) => {
+    console.error('SERVER ERROR:', err);
+    
+    // Multer error handling
+    if (err instanceof require('multer').MulterError) {
+        return res.status(400).json({
+            success: false,
+            message: `Upload Error: ${err.message}`
+        });
+    }
+
+    res.status(err.status || 500).json({
+        success: false,
+        message: err.message || 'Internal Server Error',
+        error: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
+});
+
 const PORT = process.env.PORT || 5000;
 
 const server = app.listen(

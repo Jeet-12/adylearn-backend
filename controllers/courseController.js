@@ -32,14 +32,26 @@ exports.getCourse = async (req, res) => {
 // @access  Private/Admin
 exports.createCourse = async (req, res) => {
     try {
+        console.log('Creating course with data:', req.body);
         const courseData = { ...req.body };
+        
+        // Handle numeric fields explicitly
+        if (courseData.price) courseData.price = Number(courseData.price);
+        if (courseData.discountPrice) {
+            courseData.discountPrice = Number(courseData.discountPrice);
+        } else if (courseData.discountPrice === '') {
+            delete courseData.discountPrice;
+        }
+
         if (req.file) {
             courseData.thumbnail = `/uploads/thumbnails/${req.file.filename}`;
         }
         
         const course = await Course.create(courseData);
+        console.log('Course created successfully:', course._id);
         res.status(201).json({ success: true, data: course });
     } catch (err) {
+        console.error('CREATE COURSE ERROR:', err);
         res.status(400).json({ success: false, message: err.message });
     }
 };
@@ -49,23 +61,34 @@ exports.createCourse = async (req, res) => {
 // @access  Private/Admin
 exports.updateCourse = async (req, res) => {
     try {
+        console.log('Updating course:', req.params.id, 'with data:', req.body);
         let course = await Course.findById(req.params.id);
         if (!course) {
             return res.status(404).json({ success: false, message: 'Course not found' });
         }
 
         const courseData = { ...req.body };
+        
+        // Handle numeric fields explicitly
+        if (courseData.price) courseData.price = Number(courseData.price);
+        if (courseData.discountPrice) {
+            courseData.discountPrice = Number(courseData.discountPrice);
+        } else if (courseData.discountPrice === '') {
+            courseData.discountPrice = null; // Clear discount price if empty
+        }
+
         if (req.file) {
             courseData.thumbnail = `/uploads/thumbnails/${req.file.filename}`;
         }
 
         course = await Course.findByIdAndUpdate(req.params.id, courseData, {
-            returnDocument: 'after',
+            new: true,
             runValidators: true,
         });
 
         res.status(200).json({ success: true, data: course });
     } catch (err) {
+        console.error('UPDATE COURSE ERROR:', err);
         res.status(400).json({ success: false, message: err.message });
     }
 };
