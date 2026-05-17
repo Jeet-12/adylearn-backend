@@ -13,6 +13,12 @@ exports.initiatePayment = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Please upload a payment screenshot' });
         }
 
+        // Check if there is already a pending payment
+        const existingPayment = await Payment.findOne({ user: req.user.id, course: courseId, status: 'pending' });
+        if (existingPayment) {
+            return res.status(400).json({ success: false, message: 'You already have a pending payment for this course. Please wait for verification.' });
+        }
+
         const payment = await Payment.create({
             user: req.user.id,
             course: courseId,
@@ -77,6 +83,16 @@ exports.verifyPayment = async (req, res) => {
 
                 // Increment student count for course
                 await Course.findByIdAndUpdate(payment.course, { $inc: { studentsEnrolled: 1 } });
+            }
+        } else if (status === 'rejected') {
+            // Revoke access if previously granted (just in case)
+            const user = await User.findById(payment.user);
+            if (user.purchasedCourses.includes(payment.course)) {
+                user.purchasedCourses = user.purchasedCourses.filter(c => c.toString() !== payment.course.toString());
+                await user.save();
+
+                // Decrement student count
+                await Course.findByIdAndUpdate(payment.course, { $inc: { studentsEnrolled: -1 } });
             }
         }
 
