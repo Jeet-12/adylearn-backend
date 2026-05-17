@@ -23,7 +23,7 @@ const storage = multer.diskStorage({
             dest = path.join(dest, 'thumbnails/');
         } else if (file.fieldname === 'video') {
             dest = path.join(dest, 'videos/');
-        } else if (file.fieldname === 'screenshot') {
+        } else if (file.fieldname === 'screenshot' || file.fieldname === 'qrCodeImage') {
             dest = path.join(dest, 'screenshots/');
         }
         cb(null, dest);
